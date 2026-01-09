@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Plus, Database, Edit, Trash2, Search, Filter, RefreshCw, Eye, Code2, FileText, GitBranch, Clock } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Plus, Database, Edit, Trash2, Search, Filter, RefreshCw, Eye, Code2, FileText, GitBranch, Clock, ChevronRight, ChevronDown, Server } from 'lucide-react'
 
 interface Metadata {
   id: string
@@ -15,12 +15,22 @@ interface Metadata {
   status: 'active' | 'deprecated' | 'draft'
 }
 
+interface DataSourceNode {
+  dbType: string
+  sources: string[]
+  children: Metadata[]
+}
+
 const MetadataManagement = () => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
+  const [selectedSourceType, setSelectedSourceType] = useState<string | null>(null)
+  const [selectedSource, setSelectedSource] = useState<string | null>(null)
+  const [expandedDbTypes, setExpandedDbTypes] = useState<Set<string>>(new Set())
+  const [expandedSources, setExpandedSources] = useState<Set<string>>(new Set())
 
   const [metadataList, setMetadataList] = useState<Metadata[]>([
     {
@@ -194,8 +204,73 @@ const MetadataManagement = () => {
                          md.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesType = filterType === 'all' || md.type === filterType
     const matchesStatus = filterStatus === 'all' || md.status === filterStatus
-    return matchesSearch && matchesType && matchesStatus
+    const matchesSource = !selectedSource || md.source === selectedSource
+    return matchesSearch && matchesType && matchesStatus && matchesSource
   })
+
+  // 构建数据源树形结构
+  const dataSourceTree = useMemo(() => {
+    const tree: Record<string, Record<string, Metadata[]>> = {}
+
+    metadataList.forEach(md => {
+      // 从 source 字段提取数据库类型（格式：数据源名称-数据库类型）
+      const parts = md.source.split('-')
+      const dbType = parts.length > 1 ? parts[parts.length - 1] : 'Unknown'
+      const sourceName = parts.length > 1 ? parts.slice(0, -1).join('-') : md.source
+
+      if (!tree[dbType]) {
+        tree[dbType] = {}
+      }
+      if (!tree[dbType][sourceName]) {
+        tree[dbType][sourceName] = []
+      }
+      tree[dbType][sourceName].push(md)
+    })
+
+    return tree
+  }, [metadataList])
+
+  const getDbTypeIcon = (dbType: string) => {
+    const icons: Record<string, string> = {
+      'MySQL': '🐬',
+      'Oracle': '🔴',
+      'PostgreSQL': '🐘',
+      'MongoDB': '🍃',
+      'Hive': '🐝',
+      'Unknown': '💾',
+    }
+    return icons[dbType] || '💾'
+  }
+
+  const toggleDbType = (dbType: string) => {
+    const newExpanded = new Set(expandedDbTypes)
+    if (newExpanded.has(dbType)) {
+      newExpanded.delete(dbType)
+    } else {
+      newExpanded.add(dbType)
+    }
+    setExpandedDbTypes(newExpanded)
+  }
+
+  const toggleSource = (source: string) => {
+    const newExpanded = new Set(expandedSources)
+    if (newExpanded.has(source)) {
+      newExpanded.delete(source)
+    } else {
+      newExpanded.add(source)
+    }
+    setExpandedSources(newExpanded)
+  }
+
+  const handleSourceClick = (dbType: string, sourceName: string | null) => {
+    if (sourceName) {
+      setSelectedSourceType(dbType)
+      setSelectedSource(sourceName)
+    } else {
+      setSelectedSourceType(dbType)
+      setSelectedSource(null)
+    }
+  }
 
   const summary = {
     total: metadataList.length,
@@ -223,6 +298,127 @@ const MetadataManagement = () => {
           添加元数据
         </button>
       </div>
+
+      {/* 主内容区域：左侧数据源树 + 右侧元数据列表 */}
+      <div className="flex gap-6">
+        {/* 左侧数据源树 */}
+        <div className="w-72 flex-shrink-0">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden sticky top-6">
+            <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-purple-100">
+              <div className="flex items-center gap-2">
+                <Server className="w-5 h-5 text-purple-600" />
+                <h3 className="font-semibold text-slate-800">数据源视角</h3>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">按数据库类型和数据源浏览</p>
+            </div>
+
+            <div className="p-3 max-h-[600px] overflow-y-auto">
+              {selectedSource && (
+                <div className="mb-3 pb-3 border-b border-slate-200">
+                  <button
+                    onClick={() => {
+                      setSelectedSourceType(null)
+                      setSelectedSource(null)
+                    }}
+                    className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                  >
+                    <Edit className="w-3 h-3" />
+                    清除筛选
+                  </button>
+                </div>
+              )}
+
+              <div className="space-y-1">
+                {Object.entries(dataSourceTree).map(([dbType, sources]) => (
+                  <div key={dbType}>
+                    {/* 数据库类型层 */}
+                    <button
+                      onClick={() => toggleDbType(dbType)}
+                      className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors group"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{getDbTypeIcon(dbType)}</span>
+                        <span className="font-medium text-sm text-slate-700">{dbType}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-400">
+                          {Object.values(sources).flat().length}
+                        </span>
+                        {expandedDbTypes.has(dbType) ? (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* 数据源名称层 */}
+                    {expandedDbTypes.has(dbType) && (
+                      <div className="ml-6 mt-1 space-y-1">
+                        {Object.entries(sources).map(([sourceName, metadatas]) => {
+                          const fullSource = `${sourceName}-${dbType}`
+                          const isSelected = selectedSource === fullSource
+                          const isExpanded = expandedSources.has(fullSource)
+
+                          return (
+                            <div key={sourceName}>
+                              <button
+                                onClick={() => {
+                                  toggleSource(fullSource)
+                                  handleSourceClick(dbType, sourceName)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg transition-colors ${
+                                  isSelected
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : 'hover:bg-slate-100 text-slate-600'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Database className="w-3.5 h-3.5" />
+                                  <span className="text-xs font-medium">{sourceName}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs text-slate-400">{metadatas.length}</span>
+                                  {isExpanded ? (
+                                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                                  ) : (
+                                    <ChevronRight className="w-3 h-3 text-slate-400" />
+                                  )}
+                                </div>
+                              </button>
+
+                              {/* 元数据列表（可选展开） */}
+                              {isExpanded && (
+                                <div className="ml-5 mt-1 space-y-0.5">
+                                  {metadatas.map((md) => (
+                                    <div
+                                      key={md.id}
+                                      className="flex items-center gap-2 px-2 py-1 text-xs text-slate-500 hover:bg-slate-50 rounded cursor-pointer"
+                                      onClick={() => {
+                                        setSelectedSourceType(dbType)
+                                        setSelectedSource(fullSource)
+                                      }}
+                                    >
+                                      {getTypeIcon(md.type)}
+                                      <span className="truncate">{md.name}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 右侧内容区域 */}
+        <div className="flex-1 space-y-6">
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -490,6 +686,8 @@ const MetadataManagement = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
         </div>
       </div>
     </div>

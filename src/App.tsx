@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2, Folder, Sparkles, Shield } from 'lucide-react'
+import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2, Folder, Sparkles, Shield, BookOpen } from 'lucide-react'
 import DataSourceManagement from './components/DataSourceManagement'
 import MetadataManagement from './components/MetadataManagement'
 import BusinessObjectModeling from './components/BusinessObjectModeling'
@@ -10,8 +10,9 @@ import QualityReport from './components/QualityReport'
 import AssetCenter from './components/AssetCenter'
 import AskData from './components/AskData'
 import DataSecurity from './components/DataSecurity'
+import BusinessTermManagement from './components/BusinessTermManagement'
 
-type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'check' | 'report' | 'asset' | 'ask' | 'security'
+type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'check' | 'report' | 'asset' | 'ask' | 'security' | 'terms'
 
 interface MenuItem {
   id: TabType
@@ -64,6 +65,14 @@ const menuItems: MenuItem[] = [
     icon: Code2,
     color: 'pink',
     description: 'Measures和Dimensions定义',
+    group: '语义治理',
+  },
+  {
+    id: 'terms',
+    label: '业务术语管理',
+    icon: BookOpen,
+    color: 'amber',
+    description: '统一管理业务术语定义和标准',
     group: '语义治理',
   },
 
@@ -167,6 +176,11 @@ function App() {
         active: 'bg-violet-500 text-white shadow-lg shadow-violet-500/50',
         inactive: 'text-slate-600 hover:bg-violet-50 hover:text-violet-600',
         icon: 'text-violet-500',
+      },
+      amber: {
+        active: 'bg-amber-500 text-white shadow-lg shadow-amber-500/50',
+        inactive: 'text-slate-600 hover:bg-amber-50 hover:text-amber-600',
+        icon: 'text-amber-500',
       },
       rose: {
         active: 'bg-rose-500 text-white shadow-lg shadow-rose-500/50',
@@ -493,6 +507,7 @@ function App() {
           {activeTab === 'semantic' && <SemanticUnderstanding />}
           {activeTab === 'business' && <BusinessObjectModeling />}
           {activeTab === 'semanticlayer' && <SemanticLayer />}
+          {activeTab === 'terms' && <BusinessTermManagement />}
           {activeTab === 'asset' && <AssetCenter />}
           {activeTab === 'ask' && <AskData />}
           {activeTab === 'security' && <DataSecurity />}

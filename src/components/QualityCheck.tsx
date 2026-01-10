@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, Search, Filter, Download, Upload, Activity } from 'lucide-react'
+import { Play, RefreshCw, CheckCircle, XCircle, AlertTriangle, Search, Filter, Download, Upload, Activity, Settings, ArrowRight } from 'lucide-react'
+import QualityRuleConfig from './QualityRuleConfig'
 
 interface CheckItem {
   id: string
@@ -17,6 +18,7 @@ interface CheckItem {
 }
 
 const QualityCheck = () => {
+  const [viewMode, setViewMode] = useState<'check' | 'config'>('check')
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [checkItems, setCheckItems] = useState<CheckItem[]>([
     {
@@ -163,30 +165,66 @@ const QualityCheck = () => {
 
   return (
     <div className="space-y-6">
-      {/* 页面标题 */}
+      {/* 页面标题和视图切换 */}
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">质量检测</h2>
           <p className="text-slate-500 mt-1">对语义治理数据进行全面的质量检测和评估</p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={resetChecks}
-            className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            重置
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-            <Upload className="w-4 h-4" />
-            导入配置
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-            <Download className="w-4 h-4" />
-            导出结果
-          </button>
+          {/* 视图切换按钮 */}
+          <div className="flex bg-slate-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('check')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                viewMode === 'check'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-800'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              执行检测
+            </button>
+            <button
+              onClick={() => setViewMode('config')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                viewMode === 'config'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-800'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              规则配置
+            </button>
+          </div>
+          {viewMode === 'check' && (
+            <>
+              <button
+                onClick={resetChecks}
+                className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                重置
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                <Upload className="w-4 h-4" />
+                导入配置
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                <Download className="w-4 h-4" />
+                导出结果
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {/* 规则配置视图 */}
+      {viewMode === 'config' && <QualityRuleConfig />}
+
+      {/* 检测执行视图 */}
+      {viewMode === 'check' && (
+      <>
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -353,6 +391,8 @@ const QualityCheck = () => {
           ))}
         </div>
       </div>
+      </>
+      )}
     </div>
   )
 }

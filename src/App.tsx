@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2 } from 'lucide-react'
+import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2, Folder, Sparkles, Shield } from 'lucide-react'
 import DataSourceManagement from './components/DataSourceManagement'
 import MetadataManagement from './components/MetadataManagement'
 import BusinessObjectModeling from './components/BusinessObjectModeling'
@@ -7,8 +7,11 @@ import SemanticUnderstanding from './components/SemanticUnderstanding'
 import SemanticLayer from './components/SemanticLayer'
 import QualityCheck from './components/QualityCheck'
 import QualityReport from './components/QualityReport'
+import AssetCenter from './components/AssetCenter'
+import AskData from './components/AskData'
+import DataSecurity from './components/DataSecurity'
 
-type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'check' | 'report'
+type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'check' | 'report' | 'asset' | 'ask' | 'security'
 
 interface MenuItem {
   id: TabType
@@ -81,6 +84,36 @@ const menuItems: MenuItem[] = [
     description: '查看质量分析报告',
     group: '质量管理',
   },
+
+  // 第四阶段：资产中心
+  {
+    id: 'asset',
+    label: '资产中心',
+    icon: Folder,
+    color: 'emerald',
+    description: '管理和发现数据资产',
+    group: '资产中心',
+  },
+
+  // 第五阶段：智能应用
+  {
+    id: 'ask',
+    label: '智能问数',
+    icon: Sparkles,
+    color: 'violet',
+    description: 'AI驱动的数据查询助手',
+    group: '智能应用',
+  },
+
+  // 第六阶段：安全管理
+  {
+    id: 'security',
+    label: '数据安全',
+    icon: Shield,
+    color: 'rose',
+    description: '敏感数据保护和权限控制',
+    group: '安全管理',
+  },
 ]
 
 function App() {
@@ -125,48 +158,67 @@ function App() {
         inactive: 'text-slate-600 hover:bg-pink-50 hover:text-pink-600',
         icon: 'text-pink-500',
       },
+      emerald: {
+        active: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/50',
+        inactive: 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-600',
+        icon: 'text-emerald-500',
+      },
+      violet: {
+        active: 'bg-violet-500 text-white shadow-lg shadow-violet-500/50',
+        inactive: 'text-slate-600 hover:bg-violet-50 hover:text-violet-600',
+        icon: 'text-violet-500',
+      },
+      rose: {
+        active: 'bg-rose-500 text-white shadow-lg shadow-rose-500/50',
+        inactive: 'text-slate-600 hover:bg-rose-50 hover:text-rose-600',
+        icon: 'text-rose-500',
+      },
     }
     return colors[color as keyof typeof colors] || colors.blue
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
+    <div className="min-h-screen bg-slate-100 flex">
       {/* 左侧边栏 */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-white shadow-xl border-r border-slate-200 z-40 transition-all duration-300 ${
-          sidebarCollapsed ? 'w-20' : 'w-72'
+        className={`fixed left-0 top-0 h-full bg-white shadow-md border-r border-slate-200 z-40 transition-all duration-300 ${
+          sidebarCollapsed ? 'w-16' : 'w-56'
         }`}
       >
         {/* Logo区域 */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg flex-shrink-0">
-              <CheckSquare className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200">
+          <div className={`flex items-center gap-2 ${sidebarCollapsed ? 'justify-center w-full' : ''}`}>
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-1.5 rounded flex-shrink-0">
+              <CheckSquare className="w-4 h-4 text-white" />
             </div>
             {!sidebarCollapsed && (
-              <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                语义治理平台
+              <h1 className="text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                语义治理
               </h1>
             )}
           </div>
+        </div>
+
+        {/* 折叠按钮 */}
+        <div className="flex justify-end px-2 py-1">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors hidden lg:block"
+            className="p-1 hover:bg-slate-100 rounded transition-colors"
           >
             {sidebarCollapsed ? (
-              <ChevronRight className="w-5 h-5 text-slate-600" />
+              <ChevronRight className="w-4 h-4 text-slate-500" />
             ) : (
-              <ChevronLeft className="w-5 h-5 text-slate-600" />
+              <ChevronLeft className="w-4 h-4 text-slate-500" />
             )}
           </button>
         </div>
 
         {/* 菜单项 */}
-        <nav className="p-3 space-y-4 overflow-y-auto h-[calc(100vh-73px)]">
+        <nav className="px-2 pb-2 space-y-1 overflow-y-auto h-[calc(100vh-60px)]">
           {/* 数据接入组 */}
           {!sidebarCollapsed && (
-            <div className="px-2">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">数据接入</p>
+            <div className="px-2 pt-2">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">数据接入</p>
             </div>
           )}
           {menuItems.filter(item => item.group === '数据接入').map((item) => {
@@ -181,19 +233,15 @@ function App() {
                   setActiveTab(item.id)
                   setMobileMenuOpen(false)
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
                   isActive ? colorClasses.active : colorClasses.inactive
                 }`}
+                title={sidebarCollapsed ? item.label : undefined}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
                 {!sidebarCollapsed && (
                   <div className="text-left flex-1 min-w-0">
-                    <p className="font-medium truncate">{item.label}</p>
-                    {!isActive && (
-                      <p className="text-xs text-slate-500 truncate group-hover:text-slate-600">
-                        {item.description}
-                      </p>
-                    )}
+                    <p className="text-sm font-medium truncate">{item.label}</p>
                   </div>
                 )}
               </button>
@@ -203,7 +251,7 @@ function App() {
           {/* 语义治理组 */}
           {!sidebarCollapsed && (
             <div className="px-2 pt-2">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">语义治理</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">语义治理</p>
             </div>
           )}
           {menuItems.filter(item => item.group === '语义治理').map((item) => {
@@ -218,19 +266,15 @@ function App() {
                   setActiveTab(item.id)
                   setMobileMenuOpen(false)
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
                   isActive ? colorClasses.active : colorClasses.inactive
                 }`}
+                title={sidebarCollapsed ? item.label : undefined}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
                 {!sidebarCollapsed && (
                   <div className="text-left flex-1 min-w-0">
-                    <p className="font-medium truncate">{item.label}</p>
-                    {!isActive && (
-                      <p className="text-xs text-slate-500 truncate group-hover:text-slate-600">
-                        {item.description}
-                      </p>
-                    )}
+                    <p className="text-sm font-medium truncate">{item.label}</p>
                   </div>
                 )}
               </button>
@@ -240,7 +284,7 @@ function App() {
           {/* 质量管理组 */}
           {!sidebarCollapsed && (
             <div className="px-2 pt-2">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">质量管理</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">质量管理</p>
             </div>
           )}
           {menuItems.filter(item => item.group === '质量管理').map((item) => {
@@ -255,19 +299,114 @@ function App() {
                   setActiveTab(item.id)
                   setMobileMenuOpen(false)
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
                   isActive ? colorClasses.active : colorClasses.inactive
                 }`}
+                title={sidebarCollapsed ? item.label : undefined}
               >
-                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
                 {!sidebarCollapsed && (
                   <div className="text-left flex-1 min-w-0">
-                    <p className="font-medium truncate">{item.label}</p>
-                    {!isActive && (
-                      <p className="text-xs text-slate-500 truncate group-hover:text-slate-600">
-                        {item.description}
-                      </p>
-                    )}
+                    <p className="text-sm font-medium truncate">{item.label}</p>
+                  </div>
+                )}
+              </button>
+            )
+          })}
+
+          {/* 资产中心组 */}
+          {!sidebarCollapsed && (
+            <div className="px-2 pt-2">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">资产中心</p>
+            </div>
+          )}
+          {menuItems.filter(item => item.group === '资产中心').map((item) => {
+            const Icon = item.icon
+            const isActive = activeTab === item.id
+            const colorClasses = getColorClasses(item.color, isActive)
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setMobileMenuOpen(false)
+                }}
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
+                  isActive ? colorClasses.active : colorClasses.inactive
+                }`}
+                title={sidebarCollapsed ? item.label : undefined}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                {!sidebarCollapsed && (
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.label}</p>
+                  </div>
+                )}
+              </button>
+            )
+          })}
+
+          {/* 智能应用组 */}
+          {!sidebarCollapsed && (
+            <div className="px-2 pt-2">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">智能应用</p>
+            </div>
+          )}
+          {menuItems.filter(item => item.group === '智能应用').map((item) => {
+            const Icon = item.icon
+            const isActive = activeTab === item.id
+            const colorClasses = getColorClasses(item.color, isActive)
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setMobileMenuOpen(false)
+                }}
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
+                  isActive ? colorClasses.active : colorClasses.inactive
+                }`}
+                title={sidebarCollapsed ? item.label : undefined}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                {!sidebarCollapsed && (
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.label}</p>
+                  </div>
+                )}
+              </button>
+            )
+          })}
+
+          {/* 安全管理组 */}
+          {!sidebarCollapsed && (
+            <div className="px-2 pt-2">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">安全管理</p>
+            </div>
+          )}
+          {menuItems.filter(item => item.group === '安全管理').map((item) => {
+            const Icon = item.icon
+            const isActive = activeTab === item.id
+            const colorClasses = getColorClasses(item.color, isActive)
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id)
+                  setMobileMenuOpen(false)
+                }}
+                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200 group ${
+                  isActive ? colorClasses.active : colorClasses.inactive
+                }`}
+                title={sidebarCollapsed ? item.label : undefined}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : colorClasses.icon}`} />
+                {!sidebarCollapsed && (
+                  <div className="text-left flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.label}</p>
                   </div>
                 )}
               </button>
@@ -295,24 +434,21 @@ function App() {
       {/* 主内容区域 */}
       <main
         className={`flex-1 transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
+          sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-56'
         }`}
       >
         {/* 顶部标题栏 */}
         <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20">
-          <div className="px-6 py-4">
+          <div className="px-4 py-3">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">
+                <h2 className="text-lg font-bold text-slate-800">
                   {menuItems.find(item => item.id === activeTab)?.label}
                 </h2>
-                <p className="text-slate-500 mt-1">
-                  {menuItems.find(item => item.id === activeTab)?.description}
-                </p>
               </div>
 
-              {/* 流程指示器 */}
-              <div className="hidden md:flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-lg border border-blue-200">
+              {/* 流程指示器 - 简化版 */}
+              <div className="hidden md:flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                 <div className="flex items-center gap-1">
                   {menuItems.map((item, index) => {
                     const currentIndex = menuItems.findIndex(i => i.id === activeTab)
@@ -322,10 +458,10 @@ function App() {
                     return (
                       <div key={item.id} className="flex items-center">
                         {index > 0 && (
-                          <div className={`w-8 h-0.5 ${isCompleted ? 'bg-green-500' : 'bg-slate-300'}`} />
+                          <div className={`w-4 h-0.5 ${isCompleted ? 'bg-green-500' : 'bg-slate-300'}`} />
                         )}
                         <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
                             isCompleted
                               ? 'bg-green-500 text-white'
                               : isCurrent
@@ -339,8 +475,8 @@ function App() {
                     )
                   })}
                 </div>
-                <span className="ml-2 text-sm text-slate-600">
-                  {menuItems.findIndex(item => item.id === activeTab) + 1} / {menuItems.length}
+                <span className="ml-1.5 text-xs text-slate-600">
+                  {menuItems.findIndex(item => item.id === activeTab) + 1}/{menuItems.length}
                 </span>
               </div>
             </div>
@@ -348,42 +484,7 @@ function App() {
         </header>
 
         {/* 内容区域 */}
-        <div className="p-6 space-y-6">
-          {/* 流程引导卡片 */}
-          <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-xl p-6 text-white shadow-lg">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-lg font-bold mb-2">语义治理实施流程</h3>
-                <p className="text-blue-100 text-sm mb-4">
-                  按照以下步骤进行语义治理,确保数据质量和一致性
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="bg-white text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</div>
-                      <p className="font-semibold">数据接入</p>
-                    </div>
-                    <p className="text-xs text-blue-100">配置数据源并采集元数据</p>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="bg-white text-purple-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</div>
-                      <p className="font-semibold">语义治理</p>
-                    </div>
-                    <p className="text-xs text-purple-100">建模业务对象并进行AI语义分析</p>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="bg-white text-indigo-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</div>
-                      <p className="font-semibold">质量管理</p>
-                    </div>
-                    <p className="text-xs text-indigo-100">执行质量检测并生成报告</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div className="p-4 space-y-4">
           {/* 各功能模块 */}
           {activeTab === 'check' && <QualityCheck />}
           {activeTab === 'report' && <QualityReport />}
@@ -392,6 +493,9 @@ function App() {
           {activeTab === 'semantic' && <SemanticUnderstanding />}
           {activeTab === 'business' && <BusinessObjectModeling />}
           {activeTab === 'semanticlayer' && <SemanticLayer />}
+          {activeTab === 'asset' && <AssetCenter />}
+          {activeTab === 'ask' && <AskData />}
+          {activeTab === 'security' && <DataSecurity />}
         </div>
       </main>
     </div>

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2, Folder, Sparkles, Shield, BookOpen } from 'lucide-react'
+import { CheckSquare, Database, FileText, Brain, Layers, Activity, BarChart3, ChevronLeft, ChevronRight, Menu, X, Code2, Folder, Sparkles, Shield, BookOpen, GitBranch } from 'lucide-react'
 import DataSourceManagement from './components/DataSourceManagement'
 import MetadataManagement from './components/MetadataManagement'
 import BusinessObjectModeling from './components/BusinessObjectModeling'
 import SemanticUnderstanding from './components/SemanticUnderstanding'
 import SemanticLayer from './components/SemanticLayer'
+import SemanticMappingWorkbench from './components/SemanticMappingWorkbench'
 import QualityCheck from './components/QualityCheck'
 import QualityReport from './components/QualityReport'
 import AssetCenter from './components/AssetCenter'
@@ -12,7 +13,7 @@ import AskData from './components/AskData'
 import DataSecurity from './components/DataSecurity'
 import BusinessTermManagement from './components/BusinessTermManagement'
 
-type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'check' | 'report' | 'asset' | 'ask' | 'security' | 'terms'
+type TabType = 'datasource' | 'metadata' | 'business' | 'semantic' | 'semanticlayer' | 'mapping' | 'check' | 'report' | 'asset' | 'ask' | 'security' | 'terms'
 
 interface MenuItem {
   id: TabType
@@ -65,6 +66,14 @@ const menuItems: MenuItem[] = [
     icon: Code2,
     color: 'pink',
     description: 'Measures和Dimensions定义',
+    group: '语义治理',
+  },
+  {
+    id: 'mapping',
+    label: '映射工作台',
+    icon: GitBranch,
+    color: 'violet',
+    description: '业务对象到物理表的映射配置',
     group: '语义治理',
   },
   {
@@ -507,6 +516,7 @@ function App() {
           {activeTab === 'semantic' && <SemanticUnderstanding />}
           {activeTab === 'business' && <BusinessObjectModeling />}
           {activeTab === 'semanticlayer' && <SemanticLayer />}
+          {activeTab === 'mapping' && <SemanticMappingWorkbench />}
           {activeTab === 'terms' && <BusinessTermManagement />}
           {activeTab === 'asset' && <AssetCenter />}
           {activeTab === 'ask' && <AskData />}

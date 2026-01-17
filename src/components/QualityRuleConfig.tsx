@@ -8,6 +8,7 @@ import {
   X,
   CheckCircle,
   AlertCircle,
+  XCircle,
   Database,
   Hash,
   Clock,
